@@ -1,0 +1,13 @@
+{
+  "name": "mirror-github-file-to-local",
+  "version": "0.0.0",
+  "description": "mirror files on GitHub (or other remote locations) to local files; intended for 'lightweight' NodeJS modules/packages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1"
+}
