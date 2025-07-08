@@ -21,7 +21,7 @@ GUY                       = require 'guy'
   gold
   reverse
   log     }               = GUY.trm
-
+PATH                      = require 'node:path'
 { execa
   $ }                     = require 'execa'
 # debug 'Ω___1', require 'execa'
@@ -119,15 +119,32 @@ class Nn
 
   #---------------------------------------------------------------------------------------------------------
   compile_cfg: ( cfg ) ->
-    cfg        ?= {}
-    R           = {}
-    R.target    = cfg.target ?= 'github-mirrors'
-    R.files     = cfg.files ? []
+    cfg          ?= {}
+    R             = {}
+    R.target      = cfg.target ?= 'github-mirrors'
+    R.files       = cfg.files ? []
     Object.assign R, @paths_by_repo_from_paths R.files
-    R.checkouts = {}
+    R.checkouts   = {}
+    R.symlinks    = cfg.symlinks ? {}
+    #.......................................................................................................
     for user_and_repo of R.paths_by_repo
       R.checkouts[ user_and_repo ] = ( cfg.checkouts ? {} )[ user_and_repo ] ? 'origin/main'
-    R.symlinks  = cfg.symlinks ? {}
+    #.......................................................................................................
+    R.github_urls = {}
+    for user_and_repo of R.paths_by_repo
+      R.github_urls[ user_and_repo ] = "https://github.com/#{user_and_repo}"
+    #.......................................................................................................
+    R.local_mirror_paths = {}
+    for user_and_repo of R.paths_by_repo
+      R.local_mirror_paths[ user_and_repo ] = PATH.join R.target, user_and_repo
+    #.......................................................................................................
+    R.repos = {}
+    for user_and_repo of R.paths_by_repo
+      R.repos[ user_and_repo ] = target = {}
+      target.checkout = R.checkouts[          user_and_repo ]
+      target.local    = R.local_mirror_paths[ user_and_repo ]
+      target.url      = R.github_urls[        user_and_repo ]
+    #.......................................................................................................
     return R
 
   #---------------------------------------------------------------------------------------------------------
