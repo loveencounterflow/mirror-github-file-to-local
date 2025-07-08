@@ -122,7 +122,8 @@ class Nn
     cfg        ?= {}
     R           = {}
     R.target    = cfg.target ?= 'github-mirrors'
-    Object.assign R, @paths_by_repo_from_paths cfg.files ? []
+    R.files     = cfg.files ? []
+    Object.assign R, @paths_by_repo_from_paths R.files
     R.checkouts = {}
     for user_and_repo of R.paths_by_repo
       R.checkouts[ user_and_repo ] = ( cfg.checkouts ? {} )[ user_and_repo ] ? 'origin/main'
@@ -138,15 +139,15 @@ class Nn
     for key, value of cfg
       switch true
         when Array.isArray value
-          echo keycolor key + ':'
+          echo keycolor key + ':' + ' []'
           for sub_value in value
-            echo ' ', valuecolor sub_value
+            echo ' ', valuecolor rpr sub_value
         when ( Object.getPrototypeOf value ) in [ null, object_prototype, ]
-          echo keycolor key + ':'
+          echo keycolor key + ':' # + ' {}'
           for sub_key, sub_value of value
             if Array.isArray sub_value
-              echo ' ', ( keycolor sub_key + ':' )
-              echo '   ', ( valuecolor v ) for v in sub_value
+              echo ' ', ( keycolor sub_key + ':' + ' []' )
+              echo '   ', ( valuecolor rpr v ) for v in sub_value
             else
               echo ' ', "#{keycolor sub_key + ':'} #{valuecolor sub_value}"
         else
