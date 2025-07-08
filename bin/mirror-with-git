@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+caller_path=$(pwd)
+home="$(realpath "$(realpath "${BASH_SOURCE[0]}" | xargs dirname)"/.)" ; cd "$home"
+# shellcheck source=./_common.sh
+source ./_common.sh
+cd "$caller_path"
+
+#-----------------------------------------------------------------------------------------------------------
+git_mirrors_path='./git-mirrors'
+user_and_repo='loveencounterflow/cleartype'
+github_url="https://github.com/$user_and_repo"
+local_mirror_path="$git_mirrors_path/$user_and_repo"
+
+#-----------------------------------------------------------------------------------------------------------
+function directory_exists() {
+  local path="$1"
+  echo -e "$gold$path$reset"
+  #.........................................................................................................
+  if [[ -d "$path" ]]; then
+    echo "✅ '$path' is a directory"
+    (( 1 == 1 ))
+  elif [[ -e "$path" ]]; then
+    echo "⚠️ '$path' exists but is NOT a directory"
+    (( 1 == 1 ))
+  else
+    echo "❌ '$path' does not exist"
+    (( 1 == 0 ))
+  fi
+  }
+
+#-----------------------------------------------------------------------------------------------------------
+function path_doesnt_exist() {
+  local path="$1"
+  echo -e "$gold$path$reset"
+  #.........................................................................................................
+  if [[ ! -e "$path" ]]; then
+    echo "✅ '$path' does not exist"
+    (( 1 == 1 ))
+  else
+    echo "❌ '$path' exists"
+    (( 1 == 0 ))
+  fi
+  }
+
+#-----------------------------------------------------------------------------------------------------------
+function prepare_git_mirror() (
+  # set -x
+  mkdir -p "$local_mirror_path"
+  cd "$local_mirror_path"
+  git init
+  git remote add origin "$github_url"
+  git fetch --depth=1 origin
+  git config core.sparseCheckout true
+  echo "src/main.coffee"  >> .git/info/sparse-checkout
+  echo "lib/main.js"      >> .git/info/sparse-checkout
+  git checkout --quiet origin/main
+  )
+
+# l
+# git config --list --show-origin
+# git config --list --show-origin
+# l
+# l src
+# git checkout origin/main
+
+realpath .
+if directory_exists foo; then
+  echo 'OK'
+  fi
+if directory_exists ../bin; then
+  echo 'OK'
+  fi
+
+if path_doesnt_exist "$local_mirror_path"; then
+  echo -e "$green"OK"$reset"
+  prepare_git_mirror "$local_mirror_path"
+else
+  echo -e "$red"path exists: "$local_mirror_path$reset"
+  fi
+
+realpath .
+ls -AlF "$local_mirror_path/src"
+ls -AlF "$local_mirror_path/lib"
