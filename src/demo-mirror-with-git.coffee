@@ -136,22 +136,25 @@ class Nn
     keycolor          = gold
     valuecolor        = white
     cfg              ?= @cfg
+    rpr_list_key      = ( key ) -> keycolor key + ': []'
+    rpr_other_key     = ( key ) -> keycolor key + ':'
+    rpr_value         = ( value ) -> valuecolor rpr value
     for key, value of cfg
       switch true
         when Array.isArray value
-          echo keycolor key + ':' + ' []'
+          echo rpr_list_key key
           for sub_value in value
-            echo ' ', valuecolor rpr sub_value
+            echo ' ', rpr_value sub_value
         when ( Object.getPrototypeOf value ) in [ null, object_prototype, ]
-          echo keycolor key + ':' # + ' {}'
+          echo rpr_other_key key
           for sub_key, sub_value of value
             if Array.isArray sub_value
-              echo ' ', ( keycolor sub_key + ':' + ' []' )
-              echo '   ', ( valuecolor rpr v ) for v in sub_value
+              echo ' ', ( rpr_list_key sub_key )
+              echo '   ', ( rpr_value v ) for v in sub_value
             else
-              echo ' ', "#{keycolor sub_key + ':'} #{valuecolor sub_value}"
+              echo ' ', ( rpr_other_key sub_key ), ( rpr_value sub_value )
         else
-          echo ( keycolor key + ':' ), ( valuecolor rpr value )
+          echo ( rpr_other_key key ), ( rpr_value value )
     return null
 
 #===========================================================================================================
