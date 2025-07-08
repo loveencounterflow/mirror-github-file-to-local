@@ -1,6 +1,6 @@
 {
   "name": "mirror-github-file-to-local",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "mirror files on GitHub (or other remote locations) to local files; intended for 'lightweight' NodeJS modules/packages",
   "main": "index.js",
   "scripts": {
