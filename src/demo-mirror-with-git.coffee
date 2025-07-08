@@ -138,18 +138,19 @@ class Nn
     for key, value of cfg
       switch true
         when Array.isArray value
-          info keycolor key
+          echo keycolor key + ':'
           for sub_value in value
-            urge ' ', valuecolor sub_value
+            echo ' ', valuecolor sub_value
         when ( Object.getPrototypeOf value ) in [ null, object_prototype, ]
-          info keycolor key
+          echo keycolor key + ':'
           for sub_key, sub_value of value
             if Array.isArray sub_value
-              urge ' ', ( valuecolor v ) for v in sub_value
+              echo ' ', ( keycolor sub_key + ':' )
+              echo '   ', ( valuecolor v ) for v in sub_value
             else
-              urge ' ', "#{keycolor sub_key + ':'} #{valuecolor sub_value}"
+              echo ' ', "#{keycolor sub_key + ':'} #{valuecolor sub_value}"
         else
-          info ( keycolor key + ':' ), ( valuecolor rpr value )
+          echo ( keycolor key + ':' ), ( valuecolor rpr value )
     return null
 
 #===========================================================================================================
@@ -194,7 +195,7 @@ demo_walk_js_paths_from_coffee_path = ->
   cfg = nn.compile_cfg mirror_github_file_to_local_json
   info 'Ω__31', '————————————————————————————————————————————————————'
   nn.show_config cfg
-  debug 'Ω__32', cfg.checkouts
+  debug 'Ω__32', cfg.paths_by_repo
   return null
 
 #===========================================================================================================
