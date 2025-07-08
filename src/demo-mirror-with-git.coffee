@@ -53,8 +53,8 @@ lines_of = ( execa_sync_result ) ->
 class Nn
 
   #---------------------------------------------------------------------------------------------------------
-  constructor: ( paths ) ->
-    @cfg = @paths_by_repo_from_paths paths
+  constructor: ( cfg ) ->
+    @cfg = @compile_cfg cfg
     return undefined
 
   #---------------------------------------------------------------------------------------------------------
@@ -156,56 +156,21 @@ class Nn
 
 #===========================================================================================================
 demo_walk_js_paths_from_coffee_path = ->
-  paths = [
-    'loveencounterflow/cleartype/artwork/logo.png'
-    'loveencounterflow/cleartype/src/foo.coffee'
-    'loveencounterflow/cleartype/src/main.coffee+++'
-    'loveencounterflow/cleartype/src/helpers.coffee+++'
-    'loveencounterflow/mirror-github-file-to-local/bin/mirror-with-git'
-    ]
-  nn = new Nn paths
-  #.........................................................................................................
-  for original_path in paths
-    # whisper 'Ω__19', original_path
-    for path from nn.walk_additional_paths original_path
-      info 'Ω__20', path
-  #.........................................................................................................
-  # cfg = nn.paths_by_repo_from_paths paths
-  for repo, paths of nn.cfg.paths_by_repo
-    urge 'Ω__21', repo
-    for path in paths
-      help 'Ω__22', ' ', path
-  #.........................................................................................................
-  # help()
-  # help 'Ω__23', ( rpr line ) for line in ( $.sync { lines: true, } )"ls -AlF"
-  # help()
-  # help 'Ω__24', line for line in lines_of $.sync"ls -AlF"
-  # help()
-  # help 'Ω__25', line for line in lines_of $.sync"realpath ."
-  # help 'Ω__26', line for line in lines_of $.sync"pwd"
-  # # help()
-  # # help 'Ω__27', line for line in lines_of $.sync"cd src"
-  # help()
-  # help 'Ω__28', line for line in lines_of ( $.sync { cwd: 'src', } )"pwd"
-  # help()
-  # help 'Ω__29', line for line in lines_of ( $.sync {} )"pwd"
-  # help 'Ω__30', nn.prepare_git_mirror
-  #   local_mirror_path:  'github-mirrors/loveencounterflow/cleartype'
-  #   github_url:         'https://github.com/loveencounterflow/cleartype'
-  #.........................................................................................................
-  cfg = nn.compile_cfg mirror_github_file_to_local_json
+  nn = new Nn mirror_github_file_to_local_json
   info 'Ω__31', '————————————————————————————————————————————————————'
-  nn.show_config cfg
-  debug 'Ω__32', cfg.paths_by_repo
+  info()
+  nn.show_config()
+  info()
   return null
 
 #===========================================================================================================
-cfg =
-  git_mirrors_path:   './github-mirrors'
-  user_and_repo:      'loveencounterflow/cleartype'
-  github_url:         "https://github.com/$user_and_repo"
-  local_mirror_path:  "$git_mirrors_path/$user_and_repo"
+# cfg =
+#   git_mirrors_path:   './github-mirrors'
+#   user_and_repo:      'loveencounterflow/cleartype'
+#   github_url:         "https://github.com/$user_and_repo"
+#   local_mirror_path:  "$git_mirrors_path/$user_and_repo"
 
+#===========================================================================================================
 mirror_github_file_to_local_json =
   ### path to folder where git repos are going to be mirrored ###
   target: 'github-mirrors'
