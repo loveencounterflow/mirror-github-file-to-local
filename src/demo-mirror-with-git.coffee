@@ -24,6 +24,9 @@ GUY                       = require 'guy'
 PATH                      = require 'node:path'
 { execa
   $ }                     = require 'execa'
+# { f }                     = require 'effstring'
+# write                     = ( p ) -> process.stdout.write p
+
 # debug 'Ω___1', require 'execa'
 # debug 'Ω___2', execa
 # debug 'Ω___3', $
@@ -43,6 +46,7 @@ demo_execa = ->
     count++; break if count > 10000
     help 'Ω___6', rpr line
   return null
+
 
 #===========================================================================================================
 lines_of = ( execa_sync_result ) ->
@@ -81,18 +85,18 @@ class Nn
   #---------------------------------------------------------------------------------------------------------
   paths_by_repo_from_paths: ( paths ) ->
     user_and_repo_re = ///^ (?<user> [^ \/ ]+ ) / (?<repo> [^ \/ ]+ ) / (?<filename> .+ ) $///
-    paths_by_repo = {}
+    R = {}
     for original_path in paths
       for derived_path from @walk_additional_paths original_path
         unless ( match = derived_path.match user_and_repo_re )?
-          warn "Ω___7 malformed path: #{rpr derived_path}"
+          warn "Ω__15 malformed path: #{rpr derived_path}"
           continue
         { user
           repo
           filename } = match.groups
         key = "#{user}/#{repo}"
-        ( paths_by_repo[ key ] ?= [] ).push filename
-    return { paths_by_repo, }
+        ( R[ key ] ?= [] ).push filename
+    return R
 
   #---------------------------------------------------------------------------------------------------------
   prepare_git_mirror: ({ local_mirror_path, github_url, }) ->
@@ -101,20 +105,20 @@ class Nn
     show = ( ref, execa_sync_result ) ->
       for line in lines_of execa_sync_result
         continue if line is ''
-        whisper 'Ω___8', ref, line
+        whisper 'Ω__16', ref, line
       return null
-    show 'Ω___9', ( $.sync                            )"mkdir -p #{local_mirror_path}"
-    show 'Ω__10', ( $.sync { cwd: local_mirror_path } )"git init"
-    show 'Ω__11', ( $.sync { cwd: local_mirror_path } )"git remote add origin #{github_url}"
-    show 'Ω__12', ( $.sync { cwd: local_mirror_path } )"git fetch --depth=1 origin"
-    show 'Ω__13', ( $.sync { cwd: local_mirror_path } )"git config core.sparseCheckout true"
+    show 'Ω__17', ( $.sync                            )"mkdir -p #{local_mirror_path}"
+    show 'Ω__18', ( $.sync { cwd: local_mirror_path } )"git init"
+    show 'Ω__19', ( $.sync { cwd: local_mirror_path } )"git remote add origin #{github_url}"
+    show 'Ω__20', ( $.sync { cwd: local_mirror_path } )"git fetch --depth=1 origin"
+    show 'Ω__21', ( $.sync { cwd: local_mirror_path } )"git config core.sparseCheckout true"
     ### TAINT get file list from walk_additional_paths: ###
-    show 'Ω__14', ( $.sync { cwd: local_mirror_path } )"echo ''                 >  .git/info/sparse-checkout"
-    show 'Ω__15', ( $.sync { cwd: local_mirror_path } )"echo 'src/main.coffee'  >> .git/info/sparse-checkout"
-    show 'Ω__16', ( $.sync { cwd: local_mirror_path } )"echo 'lib/main.js'      >> .git/info/sparse-checkout"
-    show 'Ω__17', ( $.sync { cwd: local_mirror_path } )"echo 'lib/main.js.map'  >> .git/info/sparse-checkout"
+    show 'Ω__22', ( $.sync { cwd: local_mirror_path } )"echo ''                 >  .git/info/sparse-checkout"
+    show 'Ω__23', ( $.sync { cwd: local_mirror_path } )"echo 'src/main.coffee'  >> .git/info/sparse-checkout"
+    show 'Ω__24', ( $.sync { cwd: local_mirror_path } )"echo 'lib/main.js'      >> .git/info/sparse-checkout"
+    show 'Ω__25', ( $.sync { cwd: local_mirror_path } )"echo 'lib/main.js.map'  >> .git/info/sparse-checkout"
     ### TAINT this should become an update/checkout command: ###
-    show 'Ω__18', ( $.sync { cwd: local_mirror_path } )"git checkout --quiet origin/main"
+    show 'Ω__26', ( $.sync { cwd: local_mirror_path } )"git checkout --quiet origin/main"
     return null
 
   #---------------------------------------------------------------------------------------------------------
@@ -123,27 +127,29 @@ class Nn
     R             = {}
     R.target      = cfg.target ?= 'github-mirrors'
     R.files       = cfg.files ? []
-    Object.assign R, @paths_by_repo_from_paths R.files
-    R.checkouts   = {}
+    paths_by_repo = @paths_by_repo_from_paths R.files
     R.symlinks    = cfg.symlinks ? {}
-    #.......................................................................................................
-    for user_and_repo of R.paths_by_repo
-      R.checkouts[ user_and_repo ] = ( cfg.checkouts ? {} )[ user_and_repo ] ? 'origin/main'
-    #.......................................................................................................
-    R.github_urls = {}
-    for user_and_repo of R.paths_by_repo
-      R.github_urls[ user_and_repo ] = "https://github.com/#{user_and_repo}"
-    #.......................................................................................................
-    R.local_mirror_paths = {}
-    for user_and_repo of R.paths_by_repo
-      R.local_mirror_paths[ user_and_repo ] = PATH.join R.target, user_and_repo
+    # R.checkouts   = {}
+    # #.......................................................................................................
+    # for user_and_repo of R.paths_by_repo
+    #   R.checkouts[ user_and_repo ] = ( cfg.checkouts ? {} )[ user_and_repo ] ? 'origin/main'
+    # #.......................................................................................................
+    # R.github_urls = {}
+    # for user_and_repo of R.paths_by_repo
+    #   R.github_urls[ user_and_repo ] = "https://github.com/#{user_and_repo}"
+    # #.......................................................................................................
+    # R.local_mirror_paths = {}
+    # for user_and_repo of R.paths_by_repo
+    #   R.local_mirror_paths[ user_and_repo ] = PATH.join R.target, user_and_repo
     #.......................................................................................................
     R.repos = {}
-    for user_and_repo of R.paths_by_repo
-      R.repos[ user_and_repo ] = target = {}
-      target.checkout = R.checkouts[          user_and_repo ]
-      target.local    = R.local_mirror_paths[ user_and_repo ]
-      target.url      = R.github_urls[        user_and_repo ]
+    for user_and_repo, paths of paths_by_repo
+      repo =
+        paths:    paths
+        checkout: ( cfg.checkouts ? {} )[ user_and_repo ] ? 'origin/main'
+        local:    PATH.join R.target, user_and_repo
+        url:      "https://github.com/#{user_and_repo}"
+      R.repos[ user_and_repo ] = repo
     #.......................................................................................................
     return R
 
@@ -177,7 +183,7 @@ class Nn
 #===========================================================================================================
 demo_walk_js_paths_from_coffee_path = ->
   nn = new Nn mirror_github_file_to_local_json
-  info 'Ω__31', '————————————————————————————————————————————————————'
+  info 'Ω__27', '————————————————————————————————————————————————————'
   info()
   nn.show_config()
   info()
@@ -227,7 +233,7 @@ mirror_github_file_to_local_json =
 if module is require.main then await do =>
   # await demo_execa()
   demo_walk_js_paths_from_coffee_path()
-  return null
+
 
 # f = ->
 #   ### NOTE commit ID can be shortened ###
