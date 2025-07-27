@@ -81,13 +81,13 @@ modules (packages)
       ```
       # <<insert lantingxu.txt>>custom EOI marker text
       ```
-      which will be rewritten to
+      which will be expanded to
       ```
-      # <<insert lantingxu.txt>>(custom EOI marker text
+      # <<insert lantingxu.txt>>custom EOI marker text
       永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。
       # custom EOI marker text<</insert>>
       ```
-    * define custom using parenthiszed `>>$EOI`: you write
+    * define custom using parenthesized `>>$EOI`: you write
       ```
       # <<insert lantingxu.txt>>((custom EOI marker text
       ```
