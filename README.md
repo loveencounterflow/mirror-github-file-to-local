@@ -105,16 +105,22 @@ modules (packages)
   * can only have up to two paren pairs in opening tag, first one controlled by user, the other used for
     random text
   * ```
-    /// ^
+    insert_tag_re =     /// ^
       (?<prefix> .*? )
       <
+      <
+      <
       (?<slash> \/? )
-      <
-      <
       (?<command> insert )
       \x20+
       ( (?<place> below | above ) \x20+ )?
-      (?<path> (?: \\> | [^ > ]  )+ )
+      (?<path>
+        (?:
+          (?: ' (?: \\' | [^ ' ]  )+ ' ) |
+          (?: " (?: \\" | [^ " ]  )+ " ) |
+          (?: \$ [a-zA-Z0-9]+          ) # insert JS identifier pattern
+          )
+        )
       >
       (?<user_eoi> [^ > ]* )
       >
