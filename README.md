@@ -105,10 +105,6 @@ modules (packages)
   * can only have up to two paren pairs in opening tag, first one controlled by user, the other used for
     random text
 
-* **`[—]`** make usable for other purposes:
-  * **`[—]`** modular MarkDown documents
-  * **`[—]`** bash scripts with inlined dependencies; consider to use something like `# <<insert above
-    path/to/source>>`
 
 
 
