@@ -69,43 +69,64 @@ modules (packages)
 * extensible End Of Insert (EOI) marker:
   * use default: you write
     ```
-    # <<insert lantingxu.txt>>
+    # <<<insert 'lantingxu.txt'>>>
     ```
     which will be rewritten to
     ```
-    # <<insert lantingxu.txt>>
+    # <<<insert 'lantingxu.txt'>>>
     永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。
-    # <</insert lantingxu.txt>>
+    # <<</insert 'lantingxu.txt'>>>
     ```
     (rule: closing insertion tag looks like the opening tag but with a slash inserted between left pointy
     brackets and `insert` command)
   * define custom EOI marker using parenthesized text between the two right pointy brackets: you write
     ```
-    # <<insert lantingxu.txt>(custom EOI marker text)>
+    # <<<insert 'lantingxu.txt'>custom EOI marker text>>
     ```
     which will be expanded to
     ```
-    # <<insert lantingxu.txt>(custom EOI marker text)>
+    # <<<insert 'lantingxu.txt'>custom EOI marker text>>
     永和九年，岁在癸丑，暮春之初，会于会稽山阴之兰亭，修禊事也。
-    # <</insert lantingxu.txt>(custom EOI marker text)>
+    # <<</insert 'lantingxu.txt'>custom EOI marker text>>
     ```
   * invariants:
-    * insert regions always start with `${prefix}<<insert\s...>${suffix}`
+    * insert regions always start with `${prefix}<<<insert\s...>${suffix}`
     * headline of insert regions always ends with
-      * either `>>` (for the default, will be expanded to `>>(${default_eoimarkertxt}`)
-      * or with `>>` followed by any number *n* of left parens, followed by an optional marker text
+      * either `>>>`
+      * or with `>>>` followed by any number *n* of left parens, followed by an optional marker text
         `${eoimarkertxt}`; EOI marker text may not include parentheses, newlines or control characters
-    * insert regions always end with the same text as they start with, except for `<<insert` becoming
-      `<</insert`
-  * `<<insert>>` commands can, in the first incarnation, not contain other `<<insert>>` commands
+    * insert regions always end with the same text as they start with, except for `<<<insert` becoming
+      `<<</insert`
+  * `<<<insert>>>` commands can, in the first incarnation, not contain other `<<<insert>>>` commands
   * in the unlikely case that an included file should contain the text of an insertion tag, say `<!--
-    <<insert below brackets.txt>(oops)> -->`, then the opening text will be amended to something like `<!--
-    <<insert below brackets.txt>(oops)(23sd34e0)> -->`, and the closing tag will become `<!-- <</insert
-    below brackets.txt>(oops)(23sd34e0)> -->`, matching each character except for the extra slash
+    <<<insert below 'brackets.txt'>>> -->`, then the opening text will be amended to something like `<!--
+    <<<insert below 'brackets.txt'>>23sd34e0> -->`, and the closing tag will become `<!-- <<</insert below
+    'brackets.txt'>>23sd34e0> -->`, matching each character except for the extra slash
   * can only have up to two paren pairs in opening tag, first one controlled by user, the other used for
     random text
-
-
+  * ```
+    /// ^
+      (?<prefix> .*? )
+      <
+      (?<slash> \/? )
+      <
+      <
+      (?<command> insert )
+      \x20+
+      ( (?<place> below | above ) \x20+ )?
+      (?<path> (?: \\> | [^ > ]  )+ )
+      >
+      (?<user_eoi> [^ > ]* )
+      >
+      (?<system_eoi> [^ > ]* )
+      >
+      (?<suffix> .*? )
+      $ ///
+    ```
+  * to be integrated:
+    * shouldn't path be a named 'attribute' to approach a more HTML/XML-ish syntax?
+    * should demand to always use quotes for path, otherwise interpret path specifier as a configured named
+      value; arbitrary unquoted strings always cause problems (see YAML, Bash)
 
 
 
